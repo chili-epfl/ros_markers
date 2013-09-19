@@ -4,7 +4,7 @@ project(ros_chilitags)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS tf)
+find_package(catkin REQUIRED COMPONENTS roscpp tf)
 
 ## System dependencies
 find_package(OpenCV REQUIRED)
@@ -73,7 +73,7 @@ add_definitions(-std=c++11)
 # )
 
 ## Declare a cpp executable
-add_executable(detect src/detect.cpp)
+add_executable(detect src/detect.cpp src/objectconfig.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
@@ -81,6 +81,7 @@ add_executable(detect src/detect.cpp)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(detect
+   yaml-cpp
    ${catkin_LIBRARIES}
    ${CHILITAGS_LDFLAGS}
    ${OpenCV_LIBRARIES}
