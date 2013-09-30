@@ -12,8 +12,6 @@ find_package(OpenCV REQUIRED)
 find_package(PkgConfig)
 pkg_search_module(CHILITAGS REQUIRED chilitags)
 
-
-
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
 ## See http://ros.org/doc/groovy/api/catkin/html/user_guide/setup_dot_py.html
@@ -66,14 +64,14 @@ catkin_package(
 ## Your package locations should be listed before other locations
 include_directories(include ${catkin_INCLUDE_DIRS} ${CHILITAGS_INCLUDE_DIRS})
 
-add_definitions(-std=c++11)
+add_definitions(-std=c++11 -DWITH_YAML)
 ## Declare a cpp library
 # add_library(ros_chilitags
 #   src/${PROJECT_NAME}/ros_chilitags.cpp
 # )
 
 ## Declare a cpp executable
-add_executable(detect src/detect.cpp src/objectconfig.cpp)
+add_executable(detect src/detect.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
@@ -81,7 +79,6 @@ add_executable(detect src/detect.cpp src/objectconfig.cpp)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(detect
-   yaml-cpp
    ${catkin_LIBRARIES}
    ${CHILITAGS_LDFLAGS}
    ${OpenCV_LIBRARIES}
