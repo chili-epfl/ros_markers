@@ -20,14 +20,15 @@ using namespace cv;
 class ChilitagsDetector
 {
 public:
-    ChilitagsDetector(ros::NodeHandle& rosNode, const string& configFilename, double squareSize, double gain = 0.9) :
+    ChilitagsDetector(ros::NodeHandle& rosNode, const string& camera_frame, const string& configFilename, double squareSize, double gain = 0.9) :
             rosNode(rosNode),
             it(rosNode),
+            camera_frame(camera_frame),
             detector(&inputImage),
             firstUncalibratedImage(true),
             objects(cv::noArray(), cv::noArray(), configFilename, squareSize, gain)
     {
-        sub = it.subscribeCamera("camera/image_raw", 1, &ChilitagsDetector::findMarkers, this);
+        sub = it.subscribeCamera("image", 1, &ChilitagsDetector::findMarkers, this);
     }
 
 
@@ -39,6 +40,7 @@ private:
 
     tf::TransformBroadcaster br;
     tf::Transform transform;
+    string camera_frame;
 
     image_geometry::PinholeCameraModel cameramodel;
     Mat cameraMatrix, distCoeffs;
@@ -106,7 +108,7 @@ private:
             br.sendTransform(
                     tf::StampedTransform(transform, 
                                          ros::Time::now(), 
-                                         "CameraTop_frame", 
+                                         camera_frame, 
                                          kv.first));
         }
 
@@ -124,8 +126,11 @@ int main(int argc, char* argv[])
     string configFilename;
     _private_node.param<string>("markers_configuration", configFilename, "");
     double squareSize, gain;
-    _private_node.param<double>("default_marker_size", squareSize, 0.);
+    _private_node.param<double>("default_marker_size", squareSize, 50.);
     _private_node.param<double>("gain", gain, 0.9);
+
+    string camera_frame;
+    _private_node.param<string>("camera_frame_id", camera_frame, "camera");
 
     if (configFilename.empty() && squareSize == 0.) {
         ROS_ERROR_STREAM("Either a marker configuration file or a default marker size\n" <<
@@ -134,7 +139,7 @@ int main(int argc, char* argv[])
     }
 
     // initialize the detector by subscribing to the camera video stream
-    ChilitagsDetector detector(rosNode, configFilename, squareSize, gain);
+    ChilitagsDetector detector(rosNode, camera_frame, configFilename, squareSize, gain);
 
     ros::spin();
 
