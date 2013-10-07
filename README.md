@@ -1,6 +1,7 @@
 ros_markers
 ===========
 
+A light
 This project is a ROS wrapper for the EPFL's chilitags library.
 
 ![Nao looking at markers](doc/nao_markers.jpg)
@@ -33,4 +34,14 @@ parameters. The most important one is the *markers configuration*.  This (YAML)
 file describes where are the markers on your objects, and let you publish the
 position of an object with multiple markers attached. See [the sample
 configuration](config/markers_configuration_sample.yml) for a complete example.
+
+Other resources
+---------------
+
+- This project is very similar to [ROS
+ALVAR](http://wiki.ros.org/ar_track_alvar). ALVAR has a broader scope (like
+support for integration with depth maps), but it is also heavier. Benchmarks
+have yet to be conducted.
+- The standard (but much older) tool is ARToolkit. It also has [ROS
+  bindings](http://wiki.ros.org/artoolkit).
 
