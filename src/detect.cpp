@@ -1,5 +1,4 @@
 #include <string>
-#include <iostream>
 
 // chilitags
 #include <DetectChilitags.hpp>
@@ -7,182 +6,137 @@
 
 // opencv2
 #include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp> // for video capture
 
 // ROS
 #include <ros/ros.h>
 #include <tf/transform_broadcaster.h>
+#include <image_transport/image_transport.h>
+#include <image_geometry/pinhole_camera_model.h>
+#include <cv_bridge/cv_bridge.h>
 
 using namespace std;
 using namespace cv;
 
-static bool readCameraMatrix(const string& filename,
-                             Mat& cameraMatrix, Mat& distCoeffs,
-                             Size& calibratedImageSize )
+class ChilitagsDetector
 {
-    cout << "Reading camera calibration from " << filename << "..." << endl;
-    FileStorage fs(filename, FileStorage::READ);
-    fs["image_width"] >> calibratedImageSize.width;
-    fs["image_height"] >> calibratedImageSize.height;
-    fs["distortion_coefficients"] >> distCoeffs;
-    fs["camera_matrix"] >> cameraMatrix;
-
-    if( distCoeffs.type() != CV_64F )
-        distCoeffs = Mat_<double>(distCoeffs);
-    if( cameraMatrix.type() != CV_64F )
-        cameraMatrix = Mat_<double>(cameraMatrix);
-
-    return true;
-}
-
-void setROSTransform(Matx44d trans, tf::Transform& transform)
-{
-    transform.setOrigin( tf::Vector3( trans(0,3) / 1000,
-                                      trans(1,3) / 1000,
-                                      trans(2,3) / 1000) );
-
-    tf::Quaternion qrot;
-    tf::Matrix3x3 mrot(
-        trans(0,0), trans(0,1), trans(0,2),
-        trans(1,0), trans(1,1), trans(1,2),
-        trans(2,0), trans(2,1), trans(2,2));
-    mrot.getRotation(qrot);
-    transform.setRotation(qrot);
-}
-
-
-int main(int argc, char* argv[])
-{
-    const char* help = "Usage: detect [--gain <filter gain, default 0.9>] [-c <markers configuration (YAML)> | -s <default marker size>] -i <camera calibration (YAML)>\n";
- 
-    // gain = 1 -> no filtering (only measurements)
-    float gain = 0.9;
-
-    char* intrinsicsFilename = 0;
-    string configFilename;
-    double squareSize = 0.;
-
-    for( int i = 1; i < argc; i++ )
+public:
+    ChilitagsDetector(ros::NodeHandle& rosNode, const string& configFilename, double squareSize, double gain = 0.9) :
+            rosNode(rosNode),
+            it(rosNode),
+            detector(&inputImage),
+            firstUncalibratedImage(true),
+            objects(cv::noArray(), cv::noArray(), configFilename, squareSize, gain)
     {
-        if( strcmp(argv[i], "-c") == 0 )
-            configFilename = string(argv[++i]);
-        else if( strcmp(argv[i], "-i") == 0 )
-            intrinsicsFilename = argv[++i];
-        else if( strcmp(argv[i], "--gain") == 0 )
-        {
-            if(sscanf(argv[++i], "%f", &gain) != 1 || gain < 0 || gain > 1)
-            {
-                printf("Incorrect --gain parameter (must be 0.0 < gain < 1.0)\n");
-                puts(help);
-                return 0;
-            }
-            else
-            {
-                cout << "Estimator gain set to " << gain << endl;
-            }
-        }
-        else if( strcmp(argv[i], "-s") == 0 )
-        {
-            if(sscanf(argv[++i], "%lf", &squareSize) != 1 || squareSize <= 0)
-            {
-                printf("Incorrect -s parameter (must be a positive real number)\n");
-                puts(help);
-                return 0;
-            }
-        }
-    }
-    if (intrinsicsFilename == 0 || (configFilename.empty() && squareSize == 0))
-    {
-        puts(help);
-        return 0;
+        sub = it.subscribeCamera("camera/image_raw", 1, &ChilitagsDetector::findMarkers, this);
     }
 
-    //ROS initialization
-    ros::init(argc, argv, "chilitags_tf_broadcaster");
-    ros::NodeHandle rosNode;
-    static tf::TransformBroadcaster br;
+
+private:
+
+    ros::NodeHandle& rosNode;
+    image_transport::ImageTransport it;
+    image_transport::CameraSubscriber sub;
+
+    tf::TransformBroadcaster br;
     tf::Transform transform;
 
-    // For (basic) profiling
-    int64 startTickCount;
-    double tagRecoDuration, poseEstimationDuration;
-
-    // Format floats
-    cout.precision(1);
-    cout.setf(ios::fixed, ios::floatfield);
-
-    int tCameraIndex = 0;
-
-    // Read camera calibration
+    image_geometry::PinholeCameraModel cameramodel;
     Mat cameraMatrix, distCoeffs;
-    Size calibratedImageSize;
-    readCameraMatrix(intrinsicsFilename, cameraMatrix, distCoeffs, calibratedImageSize );
+    bool firstUncalibratedImage;
 
-    // The source of input images
-    cv::VideoCapture tCapture(tCameraIndex);
-    if (!tCapture.isOpened())
+    Mat inputImage;
+    chilitags::DetectChilitags detector;
+    chilitags::Objects objects;
+
+    void setROSTransform(Matx44d trans, tf::Transform& transform)
     {
-        std::cerr << "Unable to initialise video capture." << std::endl;
-        return 1;
+        transform.setOrigin( tf::Vector3( trans(0,3) / 1000,
+                                        trans(1,3) / 1000,
+                                        trans(2,3) / 1000) );
+
+        tf::Quaternion qrot;
+        tf::Matrix3x3 mrot(
+            trans(0,0), trans(0,1), trans(0,2),
+            trans(1,0), trans(1,1), trans(1,2),
+            trans(2,0), trans(2,1), trans(2,2));
+        mrot.getRotation(qrot);
+        transform.setRotation(qrot);
     }
-    tCapture.set(CV_CAP_PROP_FRAME_WIDTH, calibratedImageSize.width);
-    tCapture.set(CV_CAP_PROP_FRAME_HEIGHT, calibratedImageSize.height);
 
-    // The tag detection happens in the DetectChilitags class.
-    // All it needs is a pointer to a OpenCv Image, i.e. a cv::Mat *
-    // and a call to its update() method every time the image is updated.
-    cv::Mat tInputImage;
-    chilitags::DetectChilitags tDetectChilitags(&tInputImage);
+    void findMarkers(const sensor_msgs::ImageConstPtr& msg, const sensor_msgs::CameraInfoConstPtr& camerainfo)
+    {
+        // updating the camera model is cheap if not modified
+        cameramodel.fromCameraInfo(camerainfo);
+        // publishing uncalibrated images? -> return (according to CameraInfo message documentation,
+        // K[0] == 0.0 <=> uncalibrated).
+        if(cameramodel.intrinsicMatrix()(0,0) == 0.0) {
+            if(firstUncalibratedImage) {
+                ROS_ERROR("Camera publishes uncalibrated images. Can not detect markers.");
+                ROS_WARN("Detection will start over again when camera info is available.");
+            }
+            firstUncalibratedImage = false;
+            return;
+        }
+        firstUncalibratedImage = true;
+        // TODO: can we avoid to re-set the calibration matrices for every frame? ie,
+        // how to know that the camera info has changed?
+        objects.resetCalibration(cameramodel.intrinsicMatrix(), 
+                                    cameramodel.distortionCoeffs());
 
-    // the class chilitags::Objects takes care of 3D localization of the markers
-    // and of objects (counpound markers)
-    chilitags::Objects objects(cameraMatrix, distCoeffs,
-                               configFilename,
-                               squareSize,
-                               gain);
+        // hopefully no copy here:
+        //  - assignement operator of cv::Mat does not copy the data
+        //  - toCvShare does no copy if the default (source) encoding is used.
+        inputImage = cv_bridge::toCvShare(msg)->image; 
 
-    while (rosNode.ok() ) {
-
-        // Capture a new image.
-        tCapture.read(tInputImage);
-
-        /********************************************************************
+         /********************************************************************
          *                      Markers detection                           *
          ********************************************************************/
-        startTickCount = cv::getTickCount();
-        tDetectChilitags.update();
-        tagRecoDuration = (1000 * (double) (cv::getTickCount()-startTickCount)) / cv::getTickFrequency();
-
-        startTickCount = cv::getTickCount();
+        detector.update();
 
         auto foundObjects = objects.all();
-        
-        cout << "\x1b[K" << foundObjects.size() << " objects found." << endl;
+        ROS_DEBUG_STREAM(foundObjects.size() << " objects found.");
+
         /****************************************************************
         *                Publish TF transforms                          *
         *****************************************************************/
         for (auto& kv : foundObjects) {
-
             setROSTransform(kv.second, 
                             transform);
 
             br.sendTransform(
                     tf::StampedTransform(transform, 
                                          ros::Time::now(), 
-                                         "camera", 
+                                         "CameraTop_frame", 
                                          kv.first));
         }
 
-        poseEstimationDuration = (1000 * (double) (cv::getTickCount()-startTickCount)) / cv::getTickFrequency();
+    }
+};
 
-        cout << "\x1b[K" 
-            << "Total time: " << setw(5) << poseEstimationDuration + tagRecoDuration << "ms "
-            << "(tag detection: " << setw(5) << tagRecoDuration << "ms, "
-            << ", pose estim. + ROS export: " << setw(5) << poseEstimationDuration << "ms)" << endl << "\x1b[2F";
+int main(int argc, char* argv[])
+{
+    //ROS initialization
+    ros::init(argc, argv, "chilitags_tf_broadcaster");
+    ros::NodeHandle rosNode;
+    ros::NodeHandle _private_node("~");
+
+    // load parameters
+    string configFilename;
+    _private_node.param<string>("marker_configuration", configFilename, "");
+    double squareSize, gain;
+    _private_node.param<double>("default_marker_size", squareSize, 0.);
+    _private_node.param<double>("gain", gain, 0.9);
+
+    if (configFilename.empty() && squareSize == 0.) {
+        ROS_ERROR_STREAM("Either a marker configuration file or a default marker size\n" <<
+                         "must be passed as parameter (both are also ok).");
+        return(1);
     }
 
-    cout << endl << endl;
-    tCapture.release();
+    // initialize the detector by subscribing to the camera video stream
+    ChilitagsDetector detector(rosNode, configFilename, squareSize, gain);
+
+    ros::spin();
 
     return 0;
 }

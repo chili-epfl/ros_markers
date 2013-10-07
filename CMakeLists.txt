@@ -4,7 +4,7 @@ project(ros_chilitags)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp tf)
+find_package(catkin REQUIRED COMPONENTS roscpp tf cv_bridge image_transport image_geometry)
 
 ## System dependencies
 find_package(OpenCV REQUIRED)
