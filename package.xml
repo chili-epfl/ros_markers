@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package>
-  <name>ros_chilitags</name>
+  <name>ros_markers</name>
   <version>0.1.0</version>
   <description>ROS wrapper for the chilitags fiducial marker recognition library</description>
 

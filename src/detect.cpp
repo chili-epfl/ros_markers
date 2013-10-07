@@ -116,13 +116,13 @@ private:
 int main(int argc, char* argv[])
 {
     //ROS initialization
-    ros::init(argc, argv, "chilitags_tf_broadcaster");
+    ros::init(argc, argv, "markers_tf_broadcaster");
     ros::NodeHandle rosNode;
     ros::NodeHandle _private_node("~");
 
     // load parameters
     string configFilename;
-    _private_node.param<string>("marker_configuration", configFilename, "");
+    _private_node.param<string>("markers_configuration", configFilename, "");
     double squareSize, gain;
     _private_node.param<double>("default_marker_size", squareSize, 0.);
     _private_node.param<double>("gain", gain, 0.9);
