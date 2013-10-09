@@ -118,7 +118,7 @@ private:
 int main(int argc, char* argv[])
 {
     //ROS initialization
-    ros::init(argc, argv, "markers_tf_broadcaster");
+    ros::init(argc, argv, "ros_markers");
     ros::NodeHandle rosNode;
     ros::NodeHandle _private_node("~");
 
@@ -140,6 +140,7 @@ int main(int argc, char* argv[])
 
     // initialize the detector by subscribing to the camera video stream
     ChilitagsDetector detector(rosNode, camera_frame, configFilename, squareSize, gain);
+    ROS_INFO("ros_markers is ready. Marker locations will be published on TF when detected.");
 
     ros::spin();
 

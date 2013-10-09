@@ -3,7 +3,7 @@
   <!-- Sets the image source -->
   <remap from="image" to="/camera/image_raw" />
 
-  <node pkg="ros_markers" type="detect" name="markers_tf_broadcaster">
+  <node pkg="ros_markers" type="detect" name="ros_markers">
 
     <!-- Sets the TF frame of the camera. -->
     <param name="camera_frame_id" type="str" value="my_camera" />
