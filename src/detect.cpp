@@ -14,6 +14,11 @@
 #include <image_geometry/pinhole_camera_model.h>
 #include <cv_bridge/cv_bridge.h>
 
+#ifdef WITH_KNOWLEDGE
+#include <liboro/oro.h>
+#include <liboro/socket_connector.h>
+#endif
+
 using namespace std;
 using namespace cv;
 
@@ -26,13 +31,29 @@ public:
             camera_frame(camera_frame),
             detector(&inputImage),
             firstUncalibratedImage(true),
+#ifdef WITH_KNOWLEDGE
+            connector("localhost", "6969"),
+#endif
             objects(cv::noArray(), cv::noArray(), configFilename, squareSize, gain)
     {
+#ifdef WITH_KNOWLEDGE
+        try {
+            kb = oro::Ontology::createWithConnector(connector);
+        } catch (oro::OntologyServerException ose) {
+            ROS_ERROR_STREAM("Could not connect to the knowledge base: " << ose.what());
+            exit(1);
+        }
+#endif
         sub = it.subscribeCamera("image", 1, &ChilitagsDetector::findMarkers, this);
     }
 
 
 private:
+
+#ifdef WITH_KNOWLEDGE
+    oro::SocketConnector connector;
+    oro::Ontology* kb;
+#endif
 
     ros::NodeHandle& rosNode;
     image_transport::ImageTransport it;
@@ -49,6 +70,7 @@ private:
     Mat inputImage;
     chilitags::DetectChilitags detector;
     chilitags::Objects objects;
+    set<string> objectsSeen;
 
     void setROSTransform(Matx44d trans, tf::Transform& transform)
     {
@@ -101,7 +123,15 @@ private:
         /****************************************************************
         *                Publish TF transforms                          *
         *****************************************************************/
+
+#ifdef WITH_KNOWLEDGE
+        auto previouslySeen(objectsSeen);
+#endif
+        objectsSeen.clear();
+
         for (auto& kv : foundObjects) {
+
+            objectsSeen.insert(kv.first);
             setROSTransform(kv.second, 
                             transform);
 
@@ -111,6 +141,24 @@ private:
                                          camera_frame, 
                                          kv.first));
         }
+
+#ifdef WITH_KNOWLEDGE
+        set<oro::Statement> stmts;
+        for(const auto& obj : objectsSeen) {
+            stmts.insert(obj + " isVisible true");
+            stmts.insert(obj + " rdf:type FiducialMarker");
+        }
+        if (!stmts.empty()) kb->add(stmts);
+
+        stmts.clear();
+        for (const auto& pobj : previouslySeen) {
+            if (objectsSeen.find(pobj) == objectsSeen.end()) {
+                stmts.insert(pobj + " isVisible true");
+            }
+        }
+        if (!stmts.empty()) kb->remove(stmts);
+#endif
+
 
     }
 };

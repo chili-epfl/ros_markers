@@ -27,6 +27,12 @@ catkin_package(
   DEPENDS chilitags OpenCV
 )
 
+##########################################
+##           Options                   ###
+##########################################
+
+option (WITH_KNOWLEDGE "Add support for exporting to a KB-API knowledge base" OFF)
+
 ###########
 ## Build ##
 ###########
@@ -37,11 +43,27 @@ add_definitions(-std=c++11)
 
 add_executable(detect src/detect.cpp)
 
-target_link_libraries(detect
-   ${catkin_LIBRARIES}
-   ${CHILITAGS_LDFLAGS}
-   ${OpenCV_LIBRARIES}
-)
+if (WITH_KNOWLEDGE)
+
+    add_definitions(-DWITH_KNOWLEDGE)
+    pkg_check_modules(LIBKB REQUIRED liboro)
+    include_directories(${LIBKB_INCLUDE_DIRS})
+    target_link_libraries(detect
+    ${catkin_LIBRARIES}
+    ${CHILITAGS_LDFLAGS}
+    ${OpenCV_LIBRARIES}
+    ${LIBKB_LDFLAGS}
+    )
+
+else()
+
+    target_link_libraries(detect
+    ${catkin_LIBRARIES}
+    ${CHILITAGS_LDFLAGS}
+    ${OpenCV_LIBRARIES}
+    )
+
+endif()
 
 #############
 ## Install ##
