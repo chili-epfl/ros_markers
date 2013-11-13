@@ -22,6 +22,11 @@
 using namespace std;
 using namespace cv;
 
+// how many second in the *future* the markers transformation should be published?
+// this allow to compensate for the 'slowness' of tag detection, but introduce
+// some lag in TF.
+#define TRANSFORM_FUTURE_DATING 0.5
+
 class ChilitagsDetector
 {
 public:
@@ -137,7 +142,7 @@ private:
 
             br.sendTransform(
                     tf::StampedTransform(transform, 
-                                         ros::Time::now(), 
+                                         ros::Time::now() + ros::Duration(TRANSFORM_FUTURE_DATING), 
                                          camera_frame, 
                                          kv.first));
         }
