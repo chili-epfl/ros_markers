@@ -87,11 +87,13 @@ install(TARGETS detect markers_nodelet
 install(FILES
     launch/detect.launch
     launch/gscam_nodelet_pipeline.launch
+    launch/cowriter.launch
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 
 install(FILES
     config/markers_configuration_sample.yml
+    config/markers_cowriter.yml
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/config
 )
 

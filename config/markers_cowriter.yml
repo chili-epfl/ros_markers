@@ -1,0 +1,45 @@
+%YAML:1.0
+
+
+card_no:
+    - marker: 50
+      size: 40.5
+
+card_yes:
+    - marker: 51
+      size: 40.5
+
+card_rest:
+    - marker: 59
+      size: 40.5
+
+card_stand:
+    - marker: 55
+      size: 40.5
+
+card_look:
+    - marker: 46
+      size: 40.5
+
+card_stop:
+    - marker: 62
+      size: 40.5
+
+a4sheet:
+    - marker: 0
+      size: 27
+      translation: [-72.75, -112.5, 0.]
+      keep: true
+    - marker: 1
+      size: 27
+      translation: [72.75, -112.5, 0.]
+      keep: true
+    - marker: 2
+      size: 27
+      translation: [72.75, 112.5, 0.]
+      keep: true
+    - marker: 3
+      size: 27
+      translation: [-72.75, 112.5, 0.]
+      keep: true
+

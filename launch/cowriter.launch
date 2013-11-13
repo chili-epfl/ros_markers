@@ -1,0 +1,27 @@
+<launch>
+
+  <!-- Sets the image source -->
+  <remap from="image" to="/camera/image_raw" />
+
+  <node pkg="ros_markers" type="detect" name="ros_markers">
+
+    <!-- Sets the TF frame of the camera. -->
+    <param name="camera_frame_id" type="str" value="CameraTop_frame" />
+
+    <!-- Defines which and where are the markers in the environment. The sample
+    file (markers_configuration_sample.yml) provides complete documentation.
+    -->
+    <param name="markers_configuration" type="str" value="$(find ros_markers)/config/markers_cowriter.yml" />
+
+    <!-- if set, the default_marker_size parameter will enable detection of
+    markers not listed in the markers_configuration file. default_markers_size
+    sets the size of these 'free' markers, in millimeters. -->
+    <param name="default_marker_size" type="double" value="30.0" />
+
+    <!-- set the level of filtering applied on the detected markers. 1.0 means
+    no filtering, while 0.0 is the maximum level of filtering. -->
+    <param name="gain" type="double" value="0.9" />
+
+  </node>
+
+</launch>
