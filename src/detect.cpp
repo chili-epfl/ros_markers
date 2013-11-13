@@ -53,6 +53,8 @@ public:
     }
 
 
+    int nbTrackedObjects() const {return objects.nbTrackedObjects();}
+    int nbTrackedMarkers() const {return objects.nbTrackedMarkers();}
 private:
 
 #ifdef WITH_KNOWLEDGE
@@ -194,6 +196,7 @@ int main(int argc, char* argv[])
     // initialize the detector by subscribing to the camera video stream
     ChilitagsDetector detector(rosNode, camera_frame, configFilename, squareSize, gain);
     ROS_INFO("ros_markers is ready. Marker locations will be published on TF when detected.");
+    ROS_INFO("Tracking %d markers associated to %d objects.", detector.nbTrackedMarkers(), detector.nbTrackedObjects());
 
     ros::spin();
 
