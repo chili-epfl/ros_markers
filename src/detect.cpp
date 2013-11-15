@@ -25,7 +25,7 @@ using namespace cv;
 // how many second in the *future* the markers transformation should be published?
 // this allow to compensate for the 'slowness' of tag detection, but introduce
 // some lag in TF.
-#define TRANSFORM_FUTURE_DATING 0.5
+#define TRANSFORM_FUTURE_DATING 0
 
 class ChilitagsDetector
 {
