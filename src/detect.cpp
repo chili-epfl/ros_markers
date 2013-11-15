@@ -152,8 +152,10 @@ private:
 #ifdef WITH_KNOWLEDGE
         set<oro::Statement> stmts;
         for(const auto& obj : objectsSeen) {
-            stmts.insert(obj + " isVisible true");
-            stmts.insert(obj + " rdf:type FiducialMarker");
+            if (previouslySeen.find(obj) == previouslySeen.end()) {
+                stmts.insert(obj + " isVisible true");
+                stmts.insert(obj + " rdf:type FiducialMarker");
+            }
         }
         if (!stmts.empty()) kb->add(stmts);
 
