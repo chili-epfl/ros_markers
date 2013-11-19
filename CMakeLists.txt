@@ -41,7 +41,7 @@ include_directories(include ${catkin_INCLUDE_DIRS} ${CHILITAGS_INCLUDE_DIRS})
 
 add_definitions(-std=c++11)
 
-add_executable(detect src/detect.cpp)
+add_executable(detect src/chilitagsdetector.cpp src/detect.cpp)
 
 if (WITH_KNOWLEDGE)
 
