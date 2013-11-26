@@ -4,7 +4,13 @@ project(ros_markers)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp tf cv_bridge image_transport image_geometry)
+find_package(catkin REQUIRED COMPONENTS 
+        roscpp 
+        tf 
+        cv_bridge 
+        image_transport 
+        image_geometry 
+        nodelet)
 
 ## System dependencies
 find_package(OpenCV REQUIRED)
@@ -23,8 +29,11 @@ pkg_search_module(CHILITAGS REQUIRED chilitags)
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES ros_markers
-  CATKIN_DEPENDS tf
+  CATKIN_DEPENDS 
+    tf
+    nodelet
   DEPENDS chilitags OpenCV
+  LIBRARIES 
 )
 
 ##########################################
@@ -41,43 +50,53 @@ include_directories(include ${catkin_INCLUDE_DIRS} ${CHILITAGS_INCLUDE_DIRS})
 
 add_definitions(-std=c++11)
 
-add_executable(detect src/chilitagsdetector.cpp src/detect.cpp)
+set(LIBS 
+    ${catkin_LIBRARIES}
+    ${CHILITAGS_LDFLAGS}
+    ${OpenCV_LIBRARIES}
+    )
 
 if (WITH_KNOWLEDGE)
 
     add_definitions(-DWITH_KNOWLEDGE)
     pkg_check_modules(LIBKB REQUIRED liboro)
     include_directories(${LIBKB_INCLUDE_DIRS})
-    target_link_libraries(detect
-    ${catkin_LIBRARIES}
-    ${CHILITAGS_LDFLAGS}
-    ${OpenCV_LIBRARIES}
-    ${LIBKB_LDFLAGS}
-    )
-
-else()
-
-    target_link_libraries(detect
-    ${catkin_LIBRARIES}
-    ${CHILITAGS_LDFLAGS}
-    ${OpenCV_LIBRARIES}
-    )
+    set (LIBS ${LIBS} ${LIBKB_LDFLAGS})
 
 endif()
+
+
+add_executable(detect src/chilitagsdetector.cpp src/detect.cpp)
+target_link_libraries(detect ${LIBS})
+
+add_library(markers_nodelet src/chilitagsdetector.cpp src/nodelet.cpp)
+add_dependencies(markers_nodelet ${catkin_EXPORTED_TARGETS})
+target_link_libraries(markers_nodelet ${LIBS})
+
 
 #############
 ## Install ##
 #############
 
-install(TARGETS detect
+install(TARGETS detect markers_nodelet
    ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
 install(FILES
-  launch/detect.launch
-  config/markers_configuration_sample.yml
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+    launch/detect.launch
+    launch/gscam_nodelet_pipeline.launch
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
+
+install(FILES
+    config/markers_configuration_sample.yml
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/config
+)
+
+install(FILES
+    nodelet_markers.xml
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 
