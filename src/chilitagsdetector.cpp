@@ -7,13 +7,14 @@ using namespace cv;
 // this allow to compensate for the 'slowness' of tag detection, but introduce
 // some lag in TF.
 #define TRANSFORM_FUTURE_DATING 0
-
+#define USE_CHILITAGS_DEFAULT_PARAM -1
 ChilitagsDetector::ChilitagsDetector(ros::NodeHandle& rosNode, 
                                      const string& camera_frame, 
-                                     const string& configFilename, 
-                                     double squareSize, 
+                                     const string& configFilename,
+                                     bool omitOtherTags,
+                                     double tagSize,
                                      double gain,
-                                     double persistence) :
+                                     int persistence) :
             rosNode(rosNode),
             it(rosNode),
             camera_frame(camera_frame),
@@ -21,7 +22,7 @@ ChilitagsDetector::ChilitagsDetector(ros::NodeHandle& rosNode,
 #ifdef WITH_KNOWLEDGE
             connector("localhost", "6969"),
 #endif
-            chilitags3d(cv::Size(0,0)) // will call setDefaultTagSize and setFilter
+            chilitags3d(cv::Size(0,0)) // will call setDefaultTagSize and setFilter with default chilitags parameter values
 
 {
 #ifdef WITH_KNOWLEDGE
@@ -33,9 +34,20 @@ ChilitagsDetector::ChilitagsDetector(ros::NodeHandle& rosNode,
     }
 #endif
     sub = it.subscribeCamera("image", 1, &ChilitagsDetector::findMarkers, this);
-    chilitags3d.readTagConfiguration(configFilename);
-    chilitags3d.setDefaultTagSize(squareSize);
-    chilitags3d.setFilter(persistence,  gain);
+    chilitags3d.readTagConfiguration(configFilename, omitOtherTags);
+
+    if(tagSize!=USE_CHILITAGS_DEFAULT_PARAM)
+        chilitags3d.setDefaultTagSize(tagSize); // use specified value
+
+    if(gain != USE_CHILITAGS_DEFAULT_PARAM && persistence != USE_CHILITAGS_DEFAULT_PARAM)
+    {
+        chilitags3d.setFilter(persistence,  gain); // use specified values
+    }else{
+        if( !(gain == USE_CHILITAGS_DEFAULT_PARAM && persistence == USE_CHILITAGS_DEFAULT_PARAM)){ // only one value specified
+            ROS_ERROR_STREAM("You cannot just use one of the chilitags default values for gain and persistence:\n" <<
+                      "it must be both or neither.");
+          }
+    }
 
 }
 
