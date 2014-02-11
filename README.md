@@ -1,7 +1,6 @@
 ros_markers
 ===========
 
-A light
 This project is a ROS wrapper for the EPFL's chilitags library.
 
 ![Nao looking at markers](doc/nao_markers.jpg)

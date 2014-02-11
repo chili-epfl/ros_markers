@@ -12,16 +12,17 @@ ChilitagsDetector::ChilitagsDetector(ros::NodeHandle& rosNode,
                                      const string& camera_frame, 
                                      const string& configFilename, 
                                      double squareSize, 
-                                     double gain) :
+                                     double gain,
+                                     double persistence) :
             rosNode(rosNode),
             it(rosNode),
             camera_frame(camera_frame),
-            detector(&inputImage),
             firstUncalibratedImage(true),
 #ifdef WITH_KNOWLEDGE
             connector("localhost", "6969"),
 #endif
-            objects(cv::noArray(), cv::noArray(), configFilename, squareSize, gain)
+            chilitags3d(cv::Size(0,0)) // will call setDefaultTagSize and setFilter
+
 {
 #ifdef WITH_KNOWLEDGE
     try {
@@ -32,6 +33,10 @@ ChilitagsDetector::ChilitagsDetector(ros::NodeHandle& rosNode,
     }
 #endif
     sub = it.subscribeCamera("image", 1, &ChilitagsDetector::findMarkers, this);
+    chilitags3d.readTagConfiguration(configFilename);
+    chilitags3d.setDefaultTagSize(squareSize);
+    chilitags3d.setFilter(persistence,  gain);
+
 }
 
 
@@ -68,7 +73,7 @@ void ChilitagsDetector::findMarkers(const sensor_msgs::ImageConstPtr& msg,
     firstUncalibratedImage = true;
     // TODO: can we avoid to re-set the calibration matrices for every frame? ie,
     // how to know that the camera info has changed?
-    objects.resetCalibration(cameramodel.intrinsicMatrix(), 
+    chilitags3d.setCalibration(cameramodel.intrinsicMatrix(), 
                                 cameramodel.distortionCoeffs());
 
     // hopefully no copy here:
@@ -79,9 +84,8 @@ void ChilitagsDetector::findMarkers(const sensor_msgs::ImageConstPtr& msg,
         /********************************************************************
         *                      Markers detection                           *
         ********************************************************************/
-    detector.update();
 
-    auto foundObjects = objects.all();
+    auto foundObjects = chilitags3d.estimate(inputImage);
     ROS_DEBUG_STREAM(foundObjects.size() << " objects found.");
 
     /****************************************************************

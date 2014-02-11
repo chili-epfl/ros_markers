@@ -54,9 +54,6 @@ void ChilitagsNodelet::onInit()
     // initialize the detector by subscribing to the camera video stream
     chilitags_.reset(new ChilitagsDetector(rosNode, camera_frame, configFilename, squareSize, gain));
     ROS_INFO("ros_markers nodelet is ready. Marker locations will be published on TF when detected.");
-    NODELET_INFO("Tracking %d markers associated to %d objects.", 
-            chilitags_->nbTrackedMarkers(), 
-            chilitags_->nbTrackedObjects());
 
 }
 

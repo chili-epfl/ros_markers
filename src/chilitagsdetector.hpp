@@ -2,8 +2,7 @@
 #include <set>
 
 // chilitags
-#include <chilitags/DetectChilitags.hpp>
-#include <chilitags/Objects.hpp>
+#include <chilitags.hpp>
 
 // opencv2
 #include <opencv2/core/core.hpp>
@@ -23,15 +22,12 @@
 class ChilitagsDetector
 {
 public:
-    ChilitagsDetector(ros::NodeHandle& rosNode, 
-                      const std::string& camera_frame, 
-                      const std::string& configFilename, 
-                      double squareSize, 
-                      double gain = 0.9);
-
-    int nbTrackedObjects() const {return objects.nbTrackedObjects();}
-    int nbTrackedMarkers() const {return objects.nbTrackedMarkers();}
-
+    ChilitagsDetector(ros::NodeHandle& rosNode,
+                      const std::string& camera_frame,
+                      const std::string& configFilename,
+                      double squareSize,
+                      double gain = 0.9, double persistence = 5);
+   
 private:
 
 #ifdef WITH_KNOWLEDGE
@@ -52,8 +48,7 @@ private:
     bool firstUncalibratedImage;
 
     cv::Mat inputImage;
-    chilitags::DetectChilitags detector;
-    chilitags::Objects objects;
+    chilitags::Chilitags3D chilitags3d;
     std::set<std::string> objectsSeen;
 
     void setROSTransform(cv::Matx44d trans, tf::Transform& transform);
