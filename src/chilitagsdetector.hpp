@@ -19,15 +19,53 @@
 #include <liboro/socket_connector.h>
 #endif
 
+#define USE_CHILITAGS_DEFAULT_PARAM -1
+
 class ChilitagsDetector
 {
 public:
+    /**
+       Creates an object ready to find the 3D pose of chilitags.
+
+ \param rosNode The node which has created the object.
+ \param camaera_frame The name of the camera frame for projection onto.
+ \param configFilename The name of the YAML configuration file describing rigid
+        clusters of tags. The chilitags library is distributed with a sample
+        configuration file documenting the expected format.
+ \param omitOtherTags If true, ignore the tags that are not explicitly
+        listed in the configuration file. If false (default), the 3D pose of all detected
+        tags will be estimated.
+ \param defaultTagSize The default size of tags (used to compute their 3D pose) when not
+        explicitly specified in the configuration file. To be accurate, the unit
+        must match the unit used for the camera calibration (usually, millimetres).
+
+        The default value is 20. A value of -1 will cause the default value from
+        the chilitags3d library to be used.
+
+        Note that it assumes all the tags have the same size. If tags have
+        different size, you may want to list them in the configuration file.
+ \param gain A value between 0 and 1 corresponding to the weight of the
+        previous (filtered) position in the new filtered position. 0 means that the
+        latest position of the object is returned.
+
+        The default value is 0.9. A value of -1 will cause the default value from
+        the chilitags3d library to be used.
+ \param persistence the number of frames in which a 3d object, i.e. a tag or
+        a rigid object containing several tags, should be absent before being
+        removed from the output of estimate().
+
+        The default value is 5. A value of -1 will cause the default value from
+        the chilitags3d library to be used.
+
+*/
     ChilitagsDetector(ros::NodeHandle& rosNode,
                       const std::string& camera_frame,
                       const std::string& configFilename,
-                      double squareSize,
-                      double gain = 0.9, double persistence = 5);
-   
+                      bool omitOtherTags = false,
+                      double tagSize = USE_CHILITAGS_DEFAULT_PARAM,
+                      double gain = USE_CHILITAGS_DEFAULT_PARAM,
+                      int persistence = USE_CHILITAGS_DEFAULT_PARAM);
+
 private:
 
 #ifdef WITH_KNOWLEDGE
@@ -53,7 +91,7 @@ private:
 
     void setROSTransform(cv::Matx44d trans, tf::Transform& transform);
 
-    void findMarkers(const sensor_msgs::ImageConstPtr& msg, 
+    void findMarkers(const sensor_msgs::ImageConstPtr& msg,
                      const sensor_msgs::CameraInfoConstPtr& camerainfo);
 };
 
