@@ -7,8 +7,8 @@ using namespace cv;
 // this allow to compensate for the 'slowness' of tag detection, but introduce
 // some lag in TF.
 #define TRANSFORM_FUTURE_DATING 0
-#define USE_CHILITAGS_DEFAULT_PARAM -1
-ChilitagsDetector::ChilitagsDetector(ros::NodeHandle& rosNode, 
+
+ChilitagsDetector::ChilitagsDetector(ros::NodeHandle& rosNode,
                                      const string& camera_frame, 
                                      const string& configFilename,
                                      bool omitOtherTags,

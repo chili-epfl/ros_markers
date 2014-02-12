@@ -17,10 +17,10 @@ int main(int argc, char* argv[])
     string camera_frame;
     _private_node.param<string>("camera_frame_id", camera_frame, "camera");
     double defaultTagSize, gain;
-    _private_node.param<double>("default_marker_size", defaultTagSize, 50.);
-    _private_node.param<double>("gain", gain, 0.9);
+    _private_node.param<double>("default_marker_size", defaultTagSize, USE_CHILITAGS_DEFAULT_PARAM);
+    _private_node.param<double>("gain", gain, USE_CHILITAGS_DEFAULT_PARAM);
     int persistence;
-    _private_node.param<int>("persistence", persistence, 5);
+    _private_node.param<int>("persistence", persistence, USE_CHILITAGS_DEFAULT_PARAM);
     bool omitOtherTags;
     _private_node.param<bool>("omit_other_tags", omitOtherTags, false);
 

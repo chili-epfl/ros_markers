@@ -19,6 +19,8 @@
 #include <liboro/socket_connector.h>
 #endif
 
+#define USE_CHILITAGS_DEFAULT_PARAM -1
+
 class ChilitagsDetector
 {
 public:
@@ -60,9 +62,9 @@ public:
                       const std::string& camera_frame,
                       const std::string& configFilename,
                       bool omitOtherTags = false,
-                      double tagSize = 20,
-                      double gain = 0.9,
-                      int persistence = 5);
+                      double tagSize = USE_CHILITAGS_DEFAULT_PARAM,
+                      double gain = USE_CHILITAGS_DEFAULT_PARAM,
+                      int persistence = USE_CHILITAGS_DEFAULT_PARAM);
 
 private:
 
