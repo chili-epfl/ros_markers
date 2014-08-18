@@ -19,18 +19,18 @@ This ROS node wraps the chilitags library to use the standard ROS mechanisms:
 images and camera calibration are read from a standard ROS camera, and 6D
 position of markers are published as TF transforms.
 
-The most basic usage is:
+An example usage is:
 
 ```
-$ rosrun ros_markers detect image:=/camera/image_raw
+$ roslaunch ros_markers detect image_topic:=v4l/camera/image_raw camera_frame_id:=v4l_frame
 ```
 
 This will start to look for markers in the image stream, and publish the TF
 transformation of the detected ones.
 
-The provided [launch file](launch/detect.launch) list all the available
+The provided [launch file](launch/detect.launch) lists all of the available
 parameters. The most important one is the *markers configuration*.  This (YAML)
-file describes where are the markers on your objects, and let you publish the
+file describes where the markers are on your objects, and lets you publish the
 position of an object with multiple markers attached. See [the sample
 configuration](config/markers_configuration_sample.yml) for a complete example.
 
