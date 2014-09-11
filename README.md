@@ -25,6 +25,10 @@ An example usage is:
 $ roslaunch ros_markers detect image_topic:=v4l/camera/image_raw camera_frame_id:=v4l_frame
 ```
 
+(note that if you want to launch the node directly, ie, without `roslaunch`,
+this example become: `./detect image:=v4l/camera/image_raw
+_camera_frame_id:=v4l_frame`. Do not forget the `_` before `camera_frame_id`!)
+
 This will start to look for markers in the image stream, and publish the TF
 transformation of the detected ones.
 
