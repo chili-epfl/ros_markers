@@ -60,7 +60,7 @@ public:
 */
     ChilitagsDetector(ros::NodeHandle& rosNode,
                       const std::string& camera_frame,
-                      const std::string& configFilename,
+                      const std::string& configFilename = "",
                       bool omitOtherTags = false,
                       double tagSize = USE_CHILITAGS_DEFAULT_PARAM,
                       double gain = USE_CHILITAGS_DEFAULT_PARAM,
