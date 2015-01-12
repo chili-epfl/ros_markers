@@ -58,6 +58,7 @@ void ChilitagsNodelet::onInit()
     chilitags_.reset(new ChilitagsDetector(rosNode, camera_frame, configFilename, omitOtherTags,
                                            defaultTagSize, gain, persistence));
     ROS_INFO("ros_markers nodelet is ready. Marker locations will be published on TF when detected.");
+    ROS_INFO_STREAM("Camera frame is:" << camera_frame );
 
 }
 
