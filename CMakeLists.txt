@@ -86,6 +86,7 @@ install(TARGETS detect markers_nodelet
 
 install(FILES
     launch/detect.launch
+    launch/detect_gscam.launch
     launch/gscam_nodelet_pipeline.launch
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
