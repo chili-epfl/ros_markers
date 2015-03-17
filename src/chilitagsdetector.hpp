@@ -44,27 +44,13 @@ public:
 
         Note that it assumes all the tags have the same size. If tags have
         different size, you may want to list them in the configuration file.
- \param gain A value between 0 and 1 corresponding to the weight of the
-        previous (filtered) position in the new filtered position. 0 means that the
-        latest position of the object is returned.
-
-        The default value is 0.9. A value of -1 will cause the default value from
-        the chilitags3d library to be used.
- \param persistence the number of frames in which a 3d object, i.e. a tag or
-        a rigid object containing several tags, should be absent before being
-        removed from the output of estimate().
-
-        The default value is 5. A value of -1 will cause the default value from
-        the chilitags3d library to be used.
 
 */
     ChilitagsDetector(ros::NodeHandle& rosNode,
                       const std::string& camera_frame,
                       const std::string& configFilename = "",
                       bool omitOtherTags = false,
-                      double tagSize = USE_CHILITAGS_DEFAULT_PARAM,
-                      double gain = USE_CHILITAGS_DEFAULT_PARAM,
-                      int persistence = USE_CHILITAGS_DEFAULT_PARAM);
+                      double tagSize = USE_CHILITAGS_DEFAULT_PARAM);
 
 private:
 

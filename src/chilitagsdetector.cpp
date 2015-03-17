@@ -12,9 +12,7 @@ ChilitagsDetector::ChilitagsDetector(ros::NodeHandle& rosNode,
                                      const string& camera_frame, 
                                      const string& configFilename,
                                      bool omitOtherTags,
-                                     double tagSize,
-                                     double gain,
-                                     int persistence) :
+                                     double tagSize) :
             rosNode(rosNode),
             it(rosNode),
             camera_frame(camera_frame),
@@ -22,7 +20,7 @@ ChilitagsDetector::ChilitagsDetector(ros::NodeHandle& rosNode,
 #ifdef WITH_KNOWLEDGE
             connector("localhost", "6969"),
 #endif
-            chilitags3d(cv::Size(0,0)) // will call setDefaultTagSize and setFilter with default chilitags parameter values
+            chilitags3d(cv::Size(0,0)) // will call setDefaultTagSize with default chilitags parameter values
 
 {
 #ifdef WITH_KNOWLEDGE
@@ -42,16 +40,6 @@ ChilitagsDetector::ChilitagsDetector(ros::NodeHandle& rosNode,
 
     if(tagSize!=USE_CHILITAGS_DEFAULT_PARAM)
         chilitags3d.setDefaultTagSize(tagSize); // use specified value
-
-    if(gain != USE_CHILITAGS_DEFAULT_PARAM && persistence != USE_CHILITAGS_DEFAULT_PARAM)
-    {
-        chilitags3d.setFilter(persistence,  gain); // use specified values
-    }else{
-        if( !(gain == USE_CHILITAGS_DEFAULT_PARAM && persistence == USE_CHILITAGS_DEFAULT_PARAM)){ // only one value specified
-            ROS_ERROR_STREAM("You cannot just use one of the chilitags default values for gain and persistence:\n" <<
-                      "it must be both or neither.");
-          }
-    }
 
 }
 

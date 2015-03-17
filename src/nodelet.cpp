@@ -41,11 +41,8 @@ void ChilitagsNodelet::onInit()
     _private_node.param<string>("markers_configuration", configFilename, "");
     string camera_frame;
     _private_node.param<string>("camera_frame_id", camera_frame, "camera");
-    double defaultTagSize, gain;
+    double defaultTagSize;
     _private_node.param<double>("default_marker_size", defaultTagSize, USE_CHILITAGS_DEFAULT_PARAM);
-    _private_node.param<double>("gain", gain, USE_CHILITAGS_DEFAULT_PARAM);
-    int persistence;
-    _private_node.param<int>("persistence", persistence, USE_CHILITAGS_DEFAULT_PARAM);
     bool omitOtherTags;
     _private_node.param<bool>("omit_other_tags", omitOtherTags, false);
 
@@ -55,8 +52,7 @@ void ChilitagsNodelet::onInit()
     }
 
     // initialize the detector by subscribing to the camera video stream
-    chilitags_.reset(new ChilitagsDetector(rosNode, camera_frame, configFilename, omitOtherTags,
-                                           defaultTagSize, gain, persistence));
+    chilitags_.reset(new ChilitagsDetector(rosNode, camera_frame, configFilename, omitOtherTags, defaultTagSize));
     ROS_INFO("ros_markers nodelet is ready. Marker locations will be published on TF when detected.");
     ROS_INFO_STREAM("Camera frame is:" << camera_frame );
 
