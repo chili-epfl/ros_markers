@@ -9,13 +9,11 @@ using namespace cv;
 #define TRANSFORM_FUTURE_DATING 0
 
 ChilitagsDetector::ChilitagsDetector(ros::NodeHandle& rosNode,
-                                     const string& camera_frame, 
                                      const string& configFilename,
                                      bool omitOtherTags,
                                      double tagSize) :
             rosNode(rosNode),
             it(rosNode),
-            camera_frame(camera_frame),
             firstUncalibratedImage(true),
 #ifdef WITH_KNOWLEDGE
             connector("localhost", "6969"),
@@ -110,7 +108,7 @@ void ChilitagsDetector::findMarkers(const sensor_msgs::ImageConstPtr& msg,
         br.sendTransform(
                 tf::StampedTransform(transform, 
                                         ros::Time::now() + ros::Duration(TRANSFORM_FUTURE_DATING), 
-                                        camera_frame, 
+                                        cameramodel.tfFrame(),
                                         kv.first));
     }
 

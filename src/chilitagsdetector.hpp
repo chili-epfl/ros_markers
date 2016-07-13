@@ -47,7 +47,6 @@ public:
 
 */
     ChilitagsDetector(ros::NodeHandle& rosNode,
-                      const std::string& camera_frame,
                       const std::string& configFilename = "",
                       bool omitOtherTags = false,
                       double tagSize = USE_CHILITAGS_DEFAULT_PARAM);
@@ -65,7 +64,6 @@ private:
 
     tf::TransformBroadcaster br;
     tf::Transform transform;
-    std::string camera_frame;
 
     image_geometry::PinholeCameraModel cameramodel;
     cv::Mat cameraMatrix, distCoeffs;

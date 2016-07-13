@@ -6,9 +6,6 @@
   <arg name="image_topic" default="/v4l/camera/image_raw" />
   <remap from="image" to="$(arg image_topic)" />
   
-  <!-- Sets the TF frame of the camera. -->
-  <arg name="camera_frame_id" default="camera_frame" />
-
   <!-- Defines which and where are the markers in the environment. The sample
     file (markers_configuration_sample.yml) provides complete documentation.
     -->
@@ -38,7 +35,6 @@
   </include>
 
   <node pkg="ros_markers" type="detect" name="ros_markers">
-    <param name="camera_frame_id" type="str" value="$(arg camera_frame_id)" />
     <param name="markers_configuration" type="str" 
       value="$(arg markers_configuration)" />
     <param name="omit_other_tags" type="bool" value="$(arg omit_other_tags)" />
