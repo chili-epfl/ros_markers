@@ -10,13 +10,11 @@ find_package(catkin REQUIRED COMPONENTS
         cv_bridge 
         image_transport 
         image_geometry 
-        nodelet)
+        nodelet
+        chilitags_catkin)
 
 ## System dependencies
 find_package(OpenCV REQUIRED)
-
-find_package(PkgConfig)
-pkg_search_module(CHILITAGS REQUIRED chilitags)
 
 ###################################
 ## catkin specific configuration ##
@@ -32,7 +30,7 @@ catkin_package(
   CATKIN_DEPENDS 
     tf
     nodelet
-  DEPENDS chilitags OpenCV
+  DEPENDS OpenCV
   LIBRARIES 
 )
 
@@ -46,13 +44,12 @@ option (WITH_KNOWLEDGE "Add support for exporting to a KB-API knowledge base" OF
 ## Build ##
 ###########
 
-include_directories(include ${catkin_INCLUDE_DIRS} ${CHILITAGS_INCLUDE_DIRS})
+include_directories(include ${catkin_INCLUDE_DIRS})
 
 add_definitions(-std=c++11)
 
 set(LIBS 
     ${catkin_LIBRARIES}
-    ${CHILITAGS_LDFLAGS}
     ${OpenCV_LIBRARIES}
     )
 
