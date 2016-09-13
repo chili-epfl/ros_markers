@@ -1,13 +1,13 @@
 <?xml version="1.0"?>
 <package>
-  <name>ros_markers</name>
+  <name>chilitags_catkin</name>
   <version>0.1.0</version>
-  <description>ROS wrapper for the chilitags fiducial marker recognition library</description>
+  <description>Catkin wrapper for the chilitags fiducial marker recognition library</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag --> 
   <!-- Example:  -->
   <!-- <maintainer email="jane.doe@example.com">Jane Doe</maintainer> -->
-  <maintainer email="severin.lemaignan@epfl.ch">Séverin Lemaignan</maintainer>
+  <maintainer email="nicolov@users.noreply.github.com">nicolov</maintainer>
 
 
   <!-- One license tag required, multiple allowed, one license per tag -->
@@ -26,7 +26,8 @@
   <!-- Authors do not have to be maintianers, but could be -->
   <!-- Example: -->
   <!-- <author email="jane.doe@example.com">Jane Doe</author> -->
-  <author >Séverin Lemaignan</author>
+  <author>Séverin Lemaignan</author>
+  <author>nicolov</author>
 
 
   <!-- The *_depend tags are used to specify dependencies -->
@@ -41,23 +42,4 @@
   <!-- Use test_depend for packages you need only for testing: -->
   <!--   <test_depend>gtest</test_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>tf</build_depend>
-  <build_depend>nodelet</build_depend>
-  <build_depend>OpenCV</build_depend>
-  <build_depend>chilitags</build_depend>
-  <build_depend>image_transport</build_depend>
-  <build_depend>image_geometry</build_depend>
-  <build_depend>cv_bridge</build_depend>
-  <run_depend>tf</run_depend>
-  <run_depend>nodelet</run_depend>
-  <run_depend>OpenCV</run_depend>
-  <run_depend>chilitags</run_depend>
-  <run_depend>image_transport</run_depend>
-  <run_depend>image_geometry</run_depend>
-
-
-  <!-- The export tag contains other, unspecified, tags -->
-  <export>
-      <nodelet plugin="${prefix}/nodelet_markers.xml"/>
-  </export>
 </package>

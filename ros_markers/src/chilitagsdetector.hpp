@@ -2,7 +2,7 @@
 #include <set>
 
 // chilitags
-#include <chilitags.hpp>
+#include <chilitags/chilitags.hpp>
 
 // opencv2
 #include <opencv2/core/core.hpp>

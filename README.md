@@ -19,6 +19,23 @@ This ROS node wraps the chilitags library to use the standard ROS mechanisms:
 images and camera calibration are read from a standard ROS camera, and 6D
 position of markers are published as TF transforms.
 
+
+Installation
+------------
+
+Cloning this repo inside a catkin workspace will download the chilitags library, and compile
+it together with the ROS nodes:
+
+```
+cd ~/catkin_ws/src # Or wherever you catkin workspace is
+git clone https://github.com/chili-epfl/ros_markers.git
+catkin_make --pkg chilitags_catkin ros_markers
+```
+
+
+Usage
+-----
+
 An example usage is:
 
 ```
