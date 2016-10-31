@@ -39,7 +39,7 @@ Usage
 An example usage is:
 
 ```
-$ roslaunch ros_markers detect image_topic:=v4l/camera/image_raw camera_frame_id:=v4l_frame
+$ roslaunch ros_markers detect.launch image_topic:=v4l/camera/image_raw camera_frame_id:=v4l_frame
 ```
 
 (note that if you want to launch the node directly, ie, without `roslaunch`,
