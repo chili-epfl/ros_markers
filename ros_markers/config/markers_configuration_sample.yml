@@ -14,7 +14,7 @@
 # This simple declaration allows to define name aliases for markers. 'marker'
 # and 'size' are the only two mandatory fields.
 myobject1:
-    - marker: 0
+    - tag: 0
       size: 20
 
 # The second object also has a single marker, but translated and rotated.  The
@@ -24,7 +24,7 @@ myobject1:
 # on the X axis followed by a rotation on the Y axis, followed by a rotation on
 # the Z axis.
 myobject2:
-    - marker: 1
+    - tag: 1
       size: 30
       translation: [10., 0., 0.]
       rotation: [0., 0., 90.]
@@ -34,14 +34,14 @@ myobject2:
 # If a marker sets the option 'keep' to 'true', the marker 3D position is
 # returned besides the object.
 myobject3:
-    - marker: 2
+    - tag: 2
       size: 20
       translation: [-50., -100., 0.0]
       keep: true
-    - marker: 3
+    - tag: 3
       size: 30
       translation: [50., -100., 0.0]
-    - marker: 4
+    - tag: 4
       size: 30
       translation: [50., 100., 0.0]
 
